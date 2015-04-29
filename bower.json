@@ -9,7 +9,7 @@
     "knockout"
   ],
   "dependencies": {
-    "navigation": "*",
+    "navigationjs": "*",
     "knockout": "*"
   },
   "authors": [
