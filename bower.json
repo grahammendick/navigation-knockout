@@ -1,0 +1,20 @@
+{
+  "name": "navigation-knockout",
+  "version": "1.0.0",
+  "description": "A plugin for the Navigation routing library that lets you build Hyperlinks using Knockout's binding syntax",
+  "main": "navigation.knockout.min.js",
+  "keywords": [
+    "router",
+    "navigation",
+    "knockout"
+  ],
+  "dependencies": {
+    "navigation": "*",
+    "knockout": "*"
+  },
+  "authors": [
+    "Graham Mendick"
+  ],
+  "license": "Apache License 2.0",
+  "homepage": "http://grahammendick.github.io/navigation/example/knockout/navigation.html"
+}
