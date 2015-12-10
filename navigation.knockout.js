@@ -1,26 +1,14 @@
 /**
- * Navigation v1.1.0
+ * Navigation v1.2.0
  * (c) Graham Mendick - http://grahammendick.github.io/navigation/example/knockout/navigation.html
  * License: Apache License 2.0
  */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.NavigationKnockout = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
-var NavigationBackLink = _dereq_('./NavigationBackLink');
-var NavigationLink = _dereq_('./NavigationLink');
-var RefreshLink = _dereq_('./RefreshLink');
-var NavigationKnockout = (function () {
-    function NavigationKnockout() {
-    }
-    NavigationKnockout.NavigationBackLink = NavigationBackLink;
-    NavigationKnockout.NavigationLink = NavigationLink;
-    NavigationKnockout.RefreshLink = RefreshLink;
-    return NavigationKnockout;
-})();
-module.exports = NavigationKnockout;
-
-},{"./NavigationBackLink":3,"./NavigationLink":4,"./RefreshLink":5}],2:[function(_dereq_,module,exports){
 (function (global){
-var Navigation = (typeof window !== "undefined" ? window.Navigation : typeof global !== "undefined" ? global.Navigation : null);
-var ko = (typeof window !== "undefined" ? window.ko : typeof global !== "undefined" ? global.ko : null);
+/// <reference path="navigation.d.ts" />
+/// <reference path="knockout.d.ts" />
+var Navigation = (typeof window !== "undefined" ? window['Navigation'] : typeof global !== "undefined" ? global['Navigation'] : null);
+var ko = (typeof window !== "undefined" ? window['ko'] : typeof global !== "undefined" ? global['ko'] : null);
 var LinkUtility = (function () {
     function LinkUtility() {
     }
@@ -42,10 +30,13 @@ var LinkUtility = (function () {
     LinkUtility.isActive = function (key, val) {
         if (!Navigation.StateContext.state)
             return false;
-        if (val != null && val.toString()) {
+        if (val != null) {
             var trackTypes = Navigation.StateContext.state.trackTypes;
             var currentVal = Navigation.StateContext.data[key];
-            return currentVal != null && (trackTypes ? val === currentVal : val.toString() == currentVal.toString());
+            if (currentVal != null)
+                return trackTypes ? val === currentVal : val.toString() == currentVal.toString();
+            else
+                return val === '';
         }
         return true;
     };
@@ -69,7 +60,10 @@ var LinkUtility = (function () {
                             e.preventDefault();
                         else
                             e['returnValue'] = false;
-                        Navigation.StateController.navigateLink(link);
+                        var historyAction = ko.unwrap(allBindings.get('historyAction'));
+                        if (typeof historyAction === 'string')
+                            historyAction = Navigation.HistoryAction[historyAction];
+                        Navigation.StateController.navigateLink(link, false, historyAction);
                     }
                 }
             }
@@ -94,13 +88,12 @@ var LinkUtility = (function () {
     return LinkUtility;
 })();
 module.exports = LinkUtility;
-
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],3:[function(_dereq_,module,exports){
+},{}],2:[function(_dereq_,module,exports){
 (function (global){
 var LinkUtility = _dereq_('./LinkUtility');
-var Navigation = (typeof window !== "undefined" ? window.Navigation : typeof global !== "undefined" ? global.Navigation : null);
-var ko = (typeof window !== "undefined" ? window.ko : typeof global !== "undefined" ? global.ko : null);
+var Navigation = (typeof window !== "undefined" ? window['Navigation'] : typeof global !== "undefined" ? global['Navigation'] : null);
+var ko = (typeof window !== "undefined" ? window['ko'] : typeof global !== "undefined" ? global['ko'] : null);
 var NavigationBackLink = ko.bindingHandlers['navigationBackLink'] = {
     init: function (element, valueAccessor, allBindings, viewModel) {
         LinkUtility.addListeners(element, function () { return setNavigationBackLink(element, valueAccessor); }, allBindings, viewModel);
@@ -113,13 +106,25 @@ function setNavigationBackLink(element, valueAccessor) {
     LinkUtility.setLink(element, function () { return Navigation.StateController.getNavigationBackLink(ko.unwrap(valueAccessor())); });
 }
 module.exports = NavigationBackLink;
-
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./LinkUtility":2}],4:[function(_dereq_,module,exports){
+},{"./LinkUtility":1}],3:[function(_dereq_,module,exports){
+var NavigationBackLink = _dereq_('./NavigationBackLink');
+var NavigationLink = _dereq_('./NavigationLink');
+var RefreshLink = _dereq_('./RefreshLink');
+var NavigationKnockout = (function () {
+    function NavigationKnockout() {
+    }
+    NavigationKnockout.NavigationBackLink = NavigationBackLink;
+    NavigationKnockout.NavigationLink = NavigationLink;
+    NavigationKnockout.RefreshLink = RefreshLink;
+    return NavigationKnockout;
+})();
+module.exports = NavigationKnockout;
+},{"./NavigationBackLink":2,"./NavigationLink":4,"./RefreshLink":5}],4:[function(_dereq_,module,exports){
 (function (global){
 var LinkUtility = _dereq_('./LinkUtility');
-var Navigation = (typeof window !== "undefined" ? window.Navigation : typeof global !== "undefined" ? global.Navigation : null);
-var ko = (typeof window !== "undefined" ? window.ko : typeof global !== "undefined" ? global.ko : null);
+var Navigation = (typeof window !== "undefined" ? window['Navigation'] : typeof global !== "undefined" ? global['Navigation'] : null);
+var ko = (typeof window !== "undefined" ? window['ko'] : typeof global !== "undefined" ? global['ko'] : null);
 var NavigationLink = ko.bindingHandlers['navigationLink'] = {
     init: function (element, valueAccessor, allBindings, viewModel) {
         LinkUtility.addListeners(element, function () { return setNavigationLink(element, valueAccessor, allBindings); }, allBindings, viewModel);
@@ -147,13 +152,12 @@ function isActive(action) {
     return nextState === nextState.parent.initial && nextState.parent === Navigation.StateContext.dialog;
 }
 module.exports = NavigationLink;
-
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./LinkUtility":2}],5:[function(_dereq_,module,exports){
+},{"./LinkUtility":1}],5:[function(_dereq_,module,exports){
 (function (global){
 var LinkUtility = _dereq_('./LinkUtility');
-var Navigation = (typeof window !== "undefined" ? window.Navigation : typeof global !== "undefined" ? global.Navigation : null);
-var ko = (typeof window !== "undefined" ? window.ko : typeof global !== "undefined" ? global.ko : null);
+var Navigation = (typeof window !== "undefined" ? window['Navigation'] : typeof global !== "undefined" ? global['Navigation'] : null);
+var ko = (typeof window !== "undefined" ? window['ko'] : typeof global !== "undefined" ? global['ko'] : null);
 var RefreshLink = ko.bindingHandlers['refreshLink'] = {
     init: function (element, valueAccessor, allBindings, viewModel) {
         LinkUtility.addListeners(element, function () { return setRefreshLink(element, valueAccessor, allBindings); }, allBindings, viewModel);
@@ -176,7 +180,6 @@ function setRefreshLink(element, valueAccessor, allBindings) {
     LinkUtility.setActive(element, active, ko.unwrap(allBindings.get('activeCssClass')), ko.unwrap(allBindings.get('disableActive')));
 }
 module.exports = RefreshLink;
-
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./LinkUtility":2}]},{},[1])(1)
+},{"./LinkUtility":1}]},{},[3])(3)
 });
